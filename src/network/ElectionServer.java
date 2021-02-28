@@ -36,10 +36,10 @@ public class ElectionServer implements Election {
             ElectionServer obj = new ElectionServer();
             Election stub = (Election) UnicastRemoteObject.exportObject(obj, 0);
             Registry registry = LocateRegistry.createRegistry(Config.HOST);
-            registry.bind(Config.REGISTRY_NAME, stub);
+            registry.rebind(Config.REGISTRY_NAME, stub);
             System.out.println("Server ready");
             senatorResults = new SenatorReader(Config.FILE_NAME).read();
-        } catch (RemoteException | AlreadyBoundException e) {
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
