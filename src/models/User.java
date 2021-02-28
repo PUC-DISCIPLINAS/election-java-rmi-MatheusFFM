@@ -2,7 +2,7 @@ package models;
 
 import utils.HashMD5;
 
-public class User {
+public class User implements Comparable<User> {
     private String name;
     private String hash;
 
@@ -25,5 +25,10 @@ public class User {
 
     public void setHash(String hash) {
         this.hash = hash;
+    }
+
+    @Override
+    public int compareTo(User o) {
+        return this.hash.compareTo(o.getHash());
     }
 }
