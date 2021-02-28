@@ -11,7 +11,7 @@ public class SenatorReader {
         this.fileName = fileName;
     }
 
-    public Map<String, Integer> read(){
+    public Map<String, Integer> read() {
         Map<String, Integer> senators = new HashMap<String, Integer>();
         try {
             File file = new File(fileName);

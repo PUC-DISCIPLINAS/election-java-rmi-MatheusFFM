@@ -1,7 +1,8 @@
 package utils;
 
 public class Config {
-    private Config(){
+
+    private Config() {
 
     }
 
