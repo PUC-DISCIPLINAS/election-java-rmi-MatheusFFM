@@ -1,11 +1,9 @@
 package network;
 
-import models.Senator;
 import models.User;
 import utils.Config;
 import utils.SenatorReader;
 
-import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -16,7 +14,7 @@ import java.util.Map;
 public class ElectionServer implements Election {
 
     private static Map<User, String> usersVotes = new HashMap<User, String>();
-    private static Map<Senator, Integer> senatorResults = new HashMap<Senator, Integer>();
+    private static Map<String, Integer> senatorResults = new HashMap<String, Integer>();
 
     public ElectionServer() {
     }
@@ -28,7 +26,10 @@ public class ElectionServer implements Election {
 
     @Override
     public String result(String candidate) {
-        return "Test";
+        if(!senatorResults.containsKey(candidate)){
+            return null;
+        }
+        return senatorResults.get(candidate).toString();
     }
 
     public static void main(String[] args) {

@@ -3,13 +3,15 @@ package network;
 import models.User;
 import utils.Config;
 
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Scanner;
 
 public class ElectionClient {
+    private static Scanner in = new Scanner(System.in);
 
-    public static void menu(boolean voted){
+    private static void menu(boolean voted){
         System.out.println("\n======== Menu ========");
         if(voted){
             System.out.println("1 - See results\n\n0 - EXIT");
@@ -20,14 +22,12 @@ public class ElectionClient {
     }
 
     public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
         boolean voted = false;
 
         try {
             Registry registry = LocateRegistry.getRegistry(Config.HOST);
             Election stub = (Election) registry.lookup(Config.REGISTRY_NAME);
             System.out.println("Election found");
-            System.out.println("Test: result() " + stub.result("nothing"));
 
             System.out.println("Type your name");
             System.out.print(">  ");
@@ -62,7 +62,21 @@ public class ElectionClient {
     }
 
     private static void result(Election stub, User user) {
-        System.out.println(user.getName() + " > RESULT");
+        in.nextLine();
+        System.out.println("Type the candidate number: ");
+        System.out.print(">  ");
+        String number = in.nextLine();
+        String votes = null;
+        try {
+            votes = stub.result(number);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        if(votes == null){
+            System.out.println("Couldn't find a candidate with number " + number);
+        } else{
+            System.out.println("Candidate " + number + " has " + votes + " votes");
+        }
     }
 
     private static boolean vote(Election stub, User user) {
