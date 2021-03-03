@@ -24,43 +24,55 @@ public class ElectionClient {
     public static void main(String[] args) {
         boolean voted = false;
 
-        try {
-            Registry registry = LocateRegistry.getRegistry(Config.HOST);
-            Election stub = (Election) registry.lookup(Config.REGISTRY_NAME);
-            System.out.println("Election found");
+        System.out.println("Type your name");
+        System.out.print(">  ");
+        String name = in.nextLine();
+        User user = new User(name);
+        System.out.println("\n\nWelcome " + name + "!");
 
-            System.out.println("Type your name");
-            System.out.print(">  ");
-            String name = in.nextLine();
-            User user = new User(name);
+        int response = 1;
+        int tries = 0;
+        boolean menuShow = true;
 
-            System.out.println("\n\nWelcome " + name + "!");
-            menu(voted);
-            int response = in.nextInt();
-
-            do {
-                switch (response) {
-                    case 1:
-                        result(stub, user);
-                        break;
-                    case 2:
-                        if(!voted) {
-                            voted = vote(stub, user);
-                        }
-                        break;
-                    default:
-                        System.out.println("\nPlease, type a valid command");
+        while (tries < Config.MAX_TRIES) {
+            try {
+                Registry registry = LocateRegistry.getRegistry(Config.HOST);
+                Election stub = (Election) registry.lookup(Config.REGISTRY_NAME);
+                do {
+                    menuShow = true;
+                    if(menuShow) {
+                        menu(voted);
+                        response = in.nextInt();
+                    }
+                    switch (response) {
+                        case 1:
+                            result(stub, user);
+                            break;
+                        case 2:
+                            if (!voted) {
+                                voted = vote(stub, user);
+                            }
+                            break;
+                        default:
+                            System.out.println("\nPlease, type a valid command");
+                    }
+                    tries = 0;
+                    menuShow = true;
+                } while (response != 0);
+            } catch (Exception e) {
+                tries++;
+                menuShow = false;
+                System.out.println("Reconnecting to server...");
+                try {
+                    Thread.sleep(Config.TRIES_INTERVAL);
+                } catch(InterruptedException ex){
+                    Thread.currentThread().interrupt();
                 }
-                menu(voted);
-                response = in.nextInt();
-            } while (response != 0);
-
-            System.out.println("Thank you! Exiting program...");
-
-        } catch (Exception e) {
-            System.err.println("Election exception:");
-            e.printStackTrace();
+            }
         }
+
+        System.out.println("Exiting program...");
+
     }
 
     private static void result(Election stub, User user) {
@@ -87,7 +99,7 @@ public class ElectionClient {
         System.out.print(">  ");
         String number = in.nextLine();
         boolean result = stub.vote(user.getHash(), number);
-        if(result){
+        if (result) {
             System.out.println("Success! Your vote was computed");
         } else {
             System.out.println("You can't vote in " + number);
