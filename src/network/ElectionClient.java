@@ -32,40 +32,49 @@ public class ElectionClient {
 
         int response = 1;
         int tries = 0;
-        boolean menuShow = true;
+        String number = null;
+        boolean menuDialog = true;
+        boolean connected = false;
 
         while (tries < Config.MAX_TRIES) {
             try {
-                Registry registry = LocateRegistry.getRegistry(Config.HOST);
-                Election stub = (Election) registry.lookup(Config.REGISTRY_NAME);
                 do {
-                    menuShow = true;
-                    if(menuShow) {
+                    Registry registry = LocateRegistry.getRegistry(Config.HOST);
+                    Election stub = (Election) registry.lookup(Config.REGISTRY_NAME);
+                    connected = true;
+                    if (menuDialog) {
                         menu(voted);
                         response = in.nextInt();
                     }
                     switch (response) {
                         case 1:
-                            result(stub, user);
+                            if (menuDialog)
+                                number = askNumber();
+                            result(stub, user, number);
                             break;
                         case 2:
                             if (!voted) {
-                                voted = vote(stub, user);
+                                if (menuDialog)
+                                    number = askNumber();
+                                voted = vote(stub, user, number);
                             }
                             break;
                         default:
                             System.out.println("\nPlease, type a valid command");
                     }
+                    menuDialog = true;
+                    connected = false;
                     tries = 0;
-                    menuShow = true;
                 } while (response != 0);
             } catch (Exception e) {
+                if (connected) {
+                    menuDialog = false;
+                }
                 tries++;
-                menuShow = false;
                 System.out.println("Reconnecting to server...");
                 try {
                     Thread.sleep(Config.TRIES_INTERVAL);
-                } catch(InterruptedException ex){
+                } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 }
             }
@@ -75,17 +84,17 @@ public class ElectionClient {
 
     }
 
-    private static void result(Election stub, User user) {
+    private static String askNumber() {
         in.nextLine();
         System.out.println("Type the candidate number: ");
         System.out.print(">  ");
-        String number = in.nextLine();
+        return in.nextLine();
+    }
+
+    private static void result(Election stub, User user, String number) throws RemoteException {
         String votes = null;
-        try {
-            votes = stub.result(number);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        votes = stub.result(number);
+
         if (votes == null) {
             System.out.println("Couldn't find a candidate with number " + number);
         } else {
@@ -93,11 +102,7 @@ public class ElectionClient {
         }
     }
 
-    private static boolean vote(Election stub, User user) throws RemoteException {
-        in.nextLine();
-        System.out.println("Type the candidate number: ");
-        System.out.print(">  ");
-        String number = in.nextLine();
+    private static boolean vote(Election stub, User user, String number) throws RemoteException {
         boolean result = stub.vote(user.getHash(), number);
         if (result) {
             System.out.println("Success! Your vote was computed");
