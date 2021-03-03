@@ -7,13 +7,13 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class ElectionServer implements Election {
 
-    private static Map<String, String> usersVotes = new HashMap<String, String>(); // User hash, user vote
-    private static Map<String, Integer> senatorResults = new HashMap<String, Integer>(); //senator number, senator votes
+    private static Map<String, String> usersVotes = new TreeMap<>(); // User hash, user vote
+    private static Map<String, Integer> senatorResults = new TreeMap<>(); //senator number, senator votes
 
     public ElectionServer() {
     }
