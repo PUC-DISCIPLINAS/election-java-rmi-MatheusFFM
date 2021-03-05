@@ -1,8 +1,9 @@
 package network;
 
 import utils.Config;
-import utils.SenatorReader;
+import utils.SenatorFile;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -19,12 +20,14 @@ public class ElectionServer implements Election {
     }
 
     @Override
-    public boolean vote(String hash, String candidate) {
+    public boolean vote(String hash, String candidate) throws IOException {
         if (usersVotes.containsKey(hash) || !senatorResults.containsKey(candidate)) {
             return false;
         }
         usersVotes.put(hash, candidate);
         senatorResults.put(candidate, senatorResults.get(candidate) + 1);
+        SenatorFile.write(senatorResults, Config.FILE_CACHE_NAME);
+        SenatorFile.write(usersVotes, Config.FILE_VOTES_CACHE);
         return true;
     }
 
@@ -43,7 +46,10 @@ public class ElectionServer implements Election {
             Registry registry = LocateRegistry.createRegistry(Config.HOST);
             registry.rebind(Config.REGISTRY_NAME, stub);
             System.out.println("Server ready");
-            senatorResults = new SenatorReader(Config.FILE_NAME).read();
+            SenatorFile senatorFile = new SenatorFile();
+            senatorFile.read();
+            senatorResults = senatorFile.getSenators();
+            usersVotes = senatorFile.getUserVotes();
         } catch (RemoteException e) {
             e.printStackTrace();
         }

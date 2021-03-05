@@ -3,6 +3,7 @@ package network;
 import models.User;
 import utils.Config;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -59,6 +60,9 @@ public class ElectionClient {
                                 voted = vote(stub, user, number);
                             }
                             break;
+                        case 0:
+                            tries++;
+                            break;
                         default:
                             System.out.println("\nPlease, type a valid command");
                     }
@@ -66,11 +70,11 @@ public class ElectionClient {
                     connected = false;
                     tries = 0;
                 } while (response != 0);
+                tries = Config.MAX_TRIES;
             } catch (Exception e) {
                 if (connected) {
                     menuDialog = false;
                 }
-                tries++;
                 System.out.println("Reconnecting to server...");
                 try {
                     Thread.sleep(Config.TRIES_INTERVAL);
@@ -102,7 +106,7 @@ public class ElectionClient {
         }
     }
 
-    private static boolean vote(Election stub, User user, String number) throws RemoteException {
+    private static boolean vote(Election stub, User user, String number) throws IOException {
         boolean result = stub.vote(user.getHash(), number);
         if (result) {
             System.out.println("Success! Your vote was computed");
