@@ -3,6 +3,7 @@ package network;
 import models.User;
 import utils.Config;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -102,7 +103,7 @@ public class ElectionClient {
         }
     }
 
-    private static boolean vote(Election stub, User user, String number) throws RemoteException {
+    private static boolean vote(Election stub, User user, String number) throws IOException {
         boolean result = stub.vote(user.getHash(), number);
         if (result) {
             System.out.println("Success! Your vote was computed");
