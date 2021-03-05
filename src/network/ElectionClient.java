@@ -60,6 +60,9 @@ public class ElectionClient {
                                 voted = vote(stub, user, number);
                             }
                             break;
+                        case 0:
+                            tries++;
+                            break;
                         default:
                             System.out.println("\nPlease, type a valid command");
                     }
@@ -67,11 +70,11 @@ public class ElectionClient {
                     connected = false;
                     tries = 0;
                 } while (response != 0);
+                tries = Config.MAX_TRIES;
             } catch (Exception e) {
                 if (connected) {
                     menuDialog = false;
                 }
-                tries++;
                 System.out.println("Reconnecting to server...");
                 try {
                     Thread.sleep(Config.TRIES_INTERVAL);

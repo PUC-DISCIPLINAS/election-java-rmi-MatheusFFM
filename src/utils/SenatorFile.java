@@ -3,12 +3,13 @@ package utils;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class SenatorFile {
 
-    public static Map<String, Integer> read() {
-        Map<String, Integer> senators = new HashMap<String, Integer>();
+    Map<String, Integer> senators = new HashMap<String, Integer>();
+    Map<String, String> userVotes = new HashMap<String, String>();
+
+    public void read() {
         try {
             File file = new File(Config.FILE_CACHE_NAME);
             if(!file.exists()) {
@@ -17,6 +18,15 @@ public class SenatorFile {
                 FileInputStream fileInputStream = new FileInputStream(file);
                 ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
                 senators = (Map<String, Integer>) objectInputStream.readObject();
+            }
+
+            File fileUsers = new File(Config.FILE_VOTES_CACHE);
+            if(!fileUsers.exists()) {
+                fileUsers.createNewFile();
+            } else if (fileUsers.length() != 0){
+                FileInputStream fileInputStreamUsers = new FileInputStream(fileUsers);
+                ObjectInputStream objectInputStreamUsers = new ObjectInputStream(fileInputStreamUsers);
+                userVotes = (Map<String, String>) objectInputStreamUsers.readObject();
             }
 
             File fileOrigin = new File(Config.FILE_NAME);
@@ -32,15 +42,22 @@ public class SenatorFile {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return senators;
     }
 
-    public static void write( Map<String, Integer> map) throws IOException {
-        File file = new File(Config.FILE_CACHE_NAME);
+    public static void write( Map map, String fileName) throws IOException {
+        File file = new File(fileName);
         FileOutputStream fileOutputStream = null;
         ObjectOutputStream outputStream = null;
         fileOutputStream = new FileOutputStream(file);
         outputStream = new ObjectOutputStream(fileOutputStream);
         outputStream.writeObject(map);
+    }
+
+    public Map<String, Integer> getSenators() {
+        return senators;
+    }
+
+    public Map<String, String> getUserVotes() {
+        return userVotes;
     }
 }
