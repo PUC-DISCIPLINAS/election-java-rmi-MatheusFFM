@@ -18,7 +18,7 @@ $ git clone https://github.com/PUC-DISCIPLINAS/election-java-rmi-MatheusFFM.git
 
 ```bash
 # Caminho para os arquivos .class
-$ cd election-java-rmi/out/production/election-java-rmi
+$ cd election-java-rmi-MatheusFFM/out/production/election-java-rmi
 
 # Executar o servidor
 $ java network.ElectionServer
@@ -30,7 +30,7 @@ Retorna que o servidor está pronto se a execução ocorrer com sucesso.
 
 ```bash
 # Caminho para os arquivos .class
-$ cd election-java-rmi/out/production/election-java-rmi
+$ cd election-java-rmi-MatheusFFM/out/production/election-java-rmi
 
 # Executar o cliente
 $ java network.ElectionClient
